@@ -1,5 +1,9 @@
 "use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  usernameOrEmail: z.string(),
+  email: z.string().email(),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long." }),
@@ -30,16 +34,35 @@ import { H2 } from "@/components/common/typography/H2";
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = ({}) => {
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      usernameOrEmail: "",
+      email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+
+    const res = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
+
+    setIsLoading(false);
+
+    if (res?.error) {
+      setError(res.error as string);
+    }
+    if (res?.ok) {
+      return router.push("/");
+    }
   };
 
   return (
@@ -61,18 +84,15 @@ const Login: React.FC<LoginProps> = ({}) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
-            name="usernameOrEmail"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username or Email</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Enter your username or email"
-                    {...field}
-                  />
+                  <Input placeholder="Enter your email" {...field} />
                 </FormControl>
                 <FormDescription>
-                  We'll never share your username or email with anyone else.
+                  We'll never share your email with anyone else.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -103,7 +123,9 @@ const Login: React.FC<LoginProps> = ({}) => {
                 Register
               </Link>
             </span>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isLoading}>
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

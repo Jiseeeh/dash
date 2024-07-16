@@ -1,5 +1,10 @@
 "use client";
 
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { register } from "@/actions/register";
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -24,7 +29,7 @@ import {
 } from "@/components/ui/select";
 
 import { H2 } from "@/components/common/typography/H2";
-import Link from "next/link";
+import { Role } from "@/models/User";
 
 const formSchema = z
   .object({
@@ -47,6 +52,9 @@ const formSchema = z
 interface RegisterProps {}
 
 const Register: React.FC<RegisterProps> = ({}) => {
+  const [error, setError] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,8 +66,26 @@ const Register: React.FC<RegisterProps> = ({}) => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log({ values });
+
+    setIsLoading(true);
+    const res = await register({
+      username: values.username,
+      email: values.email,
+      role: values.role,
+      password: values.password,
+    });
+    setIsLoading(false);
+
+    console.log({ res });
+
+    if (res?.error) {
+      setError(res.error);
+      return;
+    } else {
+      return router.push("/auth/login");
+    }
   };
 
   return (
@@ -125,8 +151,8 @@ const Register: React.FC<RegisterProps> = ({}) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value={Role.User}>User</SelectItem>
+                    <SelectItem value={Role.Admin}>Admin</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>This is your user type.</FormDescription>
@@ -177,7 +203,9 @@ const Register: React.FC<RegisterProps> = ({}) => {
                 Login
               </Link>
             </span>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isLoading}>
+              Submit
+            </Button>
           </div>
         </form>
       </Form>
