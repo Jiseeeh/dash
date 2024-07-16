@@ -10,6 +10,7 @@ export interface UserDocument {
   username: string;
   email: string;
   role: Role;
+  progress: number;
   password?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -38,6 +39,10 @@ const UserSchema = new Schema<UserDocument>(
       type: String,
       enum: Object.values(Role),
       default: Role.User,
+    },
+    progress: {
+      type: Number,
+      default: 0,
     },
   },
   {
