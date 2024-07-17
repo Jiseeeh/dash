@@ -5,18 +5,10 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
+
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/table/data-table";
-import { columns } from "@/components/table/Columns";
+import { columns } from "@/components/table/columns";
 import { mockData } from "@/data/mock";
 import { getRandomDate } from "@/lib/utils";
 
@@ -61,7 +53,7 @@ export default function Home() {
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
         </div>
         <nav className="mt-8 flex flex-col gap-4">
-          <Link
+          {/* <Link
             href="#"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
             prefetch={false}
@@ -82,7 +74,7 @@ export default function Home() {
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
             Dashboard
-          </Link>
+          </Link> */}
           <Link
             href="#"
             className="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
@@ -133,13 +125,6 @@ export default function Home() {
       <div className="flex flex-1 flex-col">
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center border-b bg-background px-4 sm:px-6">
           <div className="flex-1 text-lg font-semibold">Users</div>
-          <div className="flex items-center gap-4">
-            <Input
-              type="search"
-              placeholder="Search users..."
-              className="max-w-sm rounded-md bg-muted/40 px-3 py-2 text-sm"
-            />
-          </div>
         </header>
         <main className="flex-1 overflow-auto p-4 sm:p-6">
           <DataTable
