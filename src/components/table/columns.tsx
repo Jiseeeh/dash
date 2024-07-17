@@ -16,6 +16,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import { UserDocument } from "@/models/User";
 import { Progress } from "@/components/ui/progress";
+import { deleteUser } from "@/actions/deleteUser";
+import { useToast } from "@/components/ui/use-toast";
 
 const columns: ColumnDef<UserDocument>[] = [
   {
@@ -86,12 +88,13 @@ const columns: ColumnDef<UserDocument>[] = [
     accessorKey: "progress",
     header: "Progress",
     cell: ({ row }) => {
-      const value = row.getValue<number>("progress");
+      const values = row.getValue<number[]>("progress");
+      const lastValue = values[values.length - 1];
 
       return (
         <div className="flex items-center gap-2">
-          <Progress value={value} className="h-2 w-full" />
-          <span className="text-sm font-medium">{`${value}`}%</span>
+          <Progress value={lastValue} className="h-2 w-full" />
+          <span className="text-sm font-medium">{`${lastValue}`}%</span>
         </div>
       );
     },
@@ -101,6 +104,7 @@ const columns: ColumnDef<UserDocument>[] = [
     id: "actions",
     cell: ({ row }) => {
       const item = row.original;
+      const { toast } = useToast();
 
       return (
         <DropdownMenu>
@@ -113,12 +117,38 @@ const columns: ColumnDef<UserDocument>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(item._id.toString())}
+              onClick={() => {
+                navigator.clipboard.writeText(item._id.toString());
+
+                toast({
+                  title: "Copied to clipboard",
+                  description: "Successfully copied item ID",
+                });
+              }}
             >
               Copy item ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                const res = await deleteUser(item._id);
+                if (res) {
+                  toast({
+                    title: "Success",
+                    description: "Successfully deleted the user.",
+                  });
+                  return;
+                }
+                toast({
+                  variant: "destructive",
+                  title: "Error",
+                  description: "Something went wrong. Please try again.",
+                });
+              }}
+            >
+              Delete
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

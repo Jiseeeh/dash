@@ -27,32 +27,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import { useToast } from "@/components/ui/use-toast";
+import { formSchema } from "@/constants";
 import { H2 } from "@/components/common/typography/H2";
 import { Role } from "@/models/User";
-
-const formSchema = z
-  .object({
-    username: z.string().min(3).max(18),
-    email: z.string().email(),
-    role: z.enum(["user", "admin"]),
-    password: z.string().min(6),
-    confirmPassword: z.string().min(6),
-  })
-  .superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        code: "custom",
-        message: "The passwords did not match",
-        path: ["confirmPassword"],
-      });
-    }
-  });
 
 interface RegisterProps {}
 
 const Register: React.FC<RegisterProps> = ({}) => {
-  const [error, setError] = useState<string>();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -81,7 +64,12 @@ const Register: React.FC<RegisterProps> = ({}) => {
     console.log({ res });
 
     if (res?.error) {
-      setError(res.error);
+      toast({
+        title: "Error",
+        description: res.error,
+        variant: "destructive",
+      });
+
       return;
     } else {
       return router.push("/auth/login");

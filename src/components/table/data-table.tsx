@@ -26,6 +26,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { Button } from "@/components/ui/button";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -33,6 +34,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+
+import { CreateNewUser } from "./create-new-user";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -47,6 +50,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
   const table = useReactTable({
     data,
     columns,
@@ -81,7 +85,7 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center">
         <DropdownMenu>
           <DropdownMenuTrigger className="" asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="mr-auto">
               Columns
             </Button>
           </DropdownMenuTrigger>
@@ -105,10 +109,7 @@ export function DataTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="flex-1 text-sm text-right text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
+        <CreateNewUser />
       </div>
       {/* deselect all */}
       <div className="flex gap-2">
@@ -153,27 +154,22 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map(
-                (row) => (
-                  console.log({ row }),
-                  (
-                    <TableRow
-                      className="cursor-pointer"
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  )
-                )
-              )
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  className="cursor-pointer"
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : (
               <TableRow>
                 <TableCell

@@ -4,17 +4,33 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/table/data-table";
 import { columns } from "@/components/table/columns";
-import { mockData } from "@/data/mock";
-import { getRandomDate } from "@/lib/utils";
+import { UserDocument } from "@/models/User";
+import { getUsers } from "@/actions/getUsers";
+import { Button } from "@/components/ui/button";
+import { addMockData } from "@/actions/addMockData";
 
 export default function Home() {
   const { status } = useSession();
+
+  const [users, setUsers] = useState<UserDocument[] | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const users = await getUsers();
+      setUsers(users as UserDocument[]);
+    };
+
+    fetchUsers().catch(console.error);
+
+    const intervalId = setInterval(fetchUsers, 10000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -53,28 +69,6 @@ export default function Home() {
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
         </div>
         <nav className="mt-8 flex flex-col gap-4">
-          {/* <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
-            prefetch={false}
-          >
-            <svg
-              className="size-5"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-            Dashboard
-          </Link> */}
           <Link
             href="#"
             className="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
@@ -125,19 +119,24 @@ export default function Home() {
       <div className="flex flex-1 flex-col">
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center border-b bg-background px-4 sm:px-6">
           <div className="flex-1 text-lg font-semibold">Users</div>
+          {/* ! INGAT SA PAG CLICK NITO PAG INALIS sa COMMENT. 500 data to  */}
+          {/* <Button
+            onClick={async () => {
+              const res = await addMockData();
+
+              if (res) {
+                toast({
+                  title: "Success",
+                  description: "Successfully migrated fake data.",
+                });
+              }
+            }}
+          >
+            Migrate Fake Data
+          </Button> */}
         </header>
         <main className="flex-1 overflow-auto p-4 sm:p-6">
-          <DataTable
-            columns={columns}
-            data={mockData.map((data) => {
-              return {
-                ...data,
-                createdAt: getRandomDate(),
-                updatedAt: getRandomDate(),
-              };
-            })}
-          />
-          {/* <DataTable columns={columns} data={[]} /> */}
+          {users && <DataTable columns={columns} data={users} />}
         </main>
       </div>
     </div>

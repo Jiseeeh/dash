@@ -10,7 +10,7 @@ export interface UserDocument {
   username: string;
   email: string;
   role: Role;
-  progress: number;
+  progress: number[];
   password?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -41,8 +41,8 @@ const UserSchema = new Schema<UserDocument>(
       default: Role.User,
     },
     progress: {
-      type: Number,
-      default: 0,
+      type: [Number],
+      default: [0],
     },
   },
   {
