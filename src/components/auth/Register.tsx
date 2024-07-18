@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { formSchema } from "@/constants";
+import { registerFormSchema } from "@/constants";
 import { H2 } from "@/components/common/typography/H2";
 import { Role } from "@/models/User";
 
@@ -38,8 +38,8 @@ const Register: React.FC<RegisterProps> = ({}) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof registerFormSchema>>({
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       username: "",
       email: "",
@@ -49,9 +49,7 @@ const Register: React.FC<RegisterProps> = ({}) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
-
+  const onSubmit = async (values: z.infer<typeof registerFormSchema>) => {
     setIsLoading(true);
     const res = await register({
       username: values.username,
@@ -61,19 +59,17 @@ const Register: React.FC<RegisterProps> = ({}) => {
     });
     setIsLoading(false);
 
-    console.log({ res });
-
-    if (res?.error) {
-      toast({
-        title: "Error",
-        description: res.error,
-        variant: "destructive",
-      });
+    if (res) {
+      router.push("/auth/login");
 
       return;
-    } else {
-      return router.push("/auth/login");
     }
+
+    toast({
+      title: "Error",
+      description: "An error occurred. Please try again.",
+      variant: "destructive",
+    });
   };
 
   return (

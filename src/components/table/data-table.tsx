@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
-import { CreateNewUser } from "./create-new-user";
+import { UserFormDialog } from "./user-form-dialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <CreateNewUser />
+        <UserFormDialog />
       </div>
       {/* deselect all */}
       <div className="flex gap-2">

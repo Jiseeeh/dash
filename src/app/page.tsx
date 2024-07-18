@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { addMockData } from "@/actions/addMockData";
 
 export default function Home() {
-  const { status } = useSession();
+  const { status, data } = useSession();
 
   const [users, setUsers] = useState<UserDocument[] | null>(null);
   const router = useRouter();
@@ -27,9 +27,9 @@ export default function Home() {
 
     fetchUsers().catch(console.error);
 
-    const intervalId = setInterval(fetchUsers, 10000);
+    // const intervalId = setInterval(fetchUsers, 10000);
 
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {

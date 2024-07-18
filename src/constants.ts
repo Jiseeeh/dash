@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const formSchema = z
+export const registerFormSchema = z
   .object({
     username: z.string().min(3).max(18),
     email: z.string().email(),
@@ -17,3 +17,9 @@ export const formSchema = z
       });
     }
   });
+
+export const updateFormSchema = z.object({
+  username: z.string().min(3).max(18),
+  email: z.string().email(),
+  role: z.enum(["user", "admin"]),
+});

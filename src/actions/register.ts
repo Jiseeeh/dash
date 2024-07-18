@@ -2,8 +2,8 @@
 
 import bcrypt from "bcryptjs";
 
-import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
+import { connectDB } from "@/lib/mongodb";
 
 export const register = async (values: any) => {
   const { email, password, username, role } = values;
@@ -29,7 +29,7 @@ export const register = async (values: any) => {
 
     const savedUser = await user.save();
 
-    console.log({ savedUser });
+    return true;
   } catch (e) {
     console.log(e);
   }

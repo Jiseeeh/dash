@@ -18,6 +18,7 @@ import { UserDocument } from "@/models/User";
 import { Progress } from "@/components/ui/progress";
 import { deleteUser } from "@/actions/deleteUser";
 import { useToast } from "@/components/ui/use-toast";
+import { UserFormDialog } from "./user-form-dialog";
 
 const columns: ColumnDef<UserDocument>[] = [
   {
@@ -129,7 +130,7 @@ const columns: ColumnDef<UserDocument>[] = [
               Copy item ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <UserFormDialog user={item} />
             <DropdownMenuItem
               onClick={async () => {
                 const res = await deleteUser(item._id);
