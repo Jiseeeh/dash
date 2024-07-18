@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 
@@ -19,6 +20,7 @@ import { Progress } from "@/components/ui/progress";
 import { deleteUser } from "@/actions/deleteUser";
 import { useToast } from "@/components/ui/use-toast";
 import { UserFormDialog } from "./user-form-dialog";
+import { Tabs, useTabs } from "@/stores/sidebar-store";
 
 const columns: ColumnDef<UserDocument>[] = [
   {
@@ -106,6 +108,8 @@ const columns: ColumnDef<UserDocument>[] = [
     cell: ({ row }) => {
       const item = row.original;
       const { toast } = useToast();
+      const router = useRouter();
+      const updateTab = useTabs((state) => state.updateTab);
 
       return (
         <DropdownMenu>
@@ -118,6 +122,7 @@ const columns: ColumnDef<UserDocument>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
+              className="cursor-pointer"
               onClick={() => {
                 navigator.clipboard.writeText(item._id.toString());
 
@@ -130,8 +135,18 @@ const columns: ColumnDef<UserDocument>[] = [
               Copy item ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                router.push(`/users/${row.original._id}`);
+                updateTab(Tabs.User);
+              }}
+            >
+              Preview
+            </DropdownMenuItem>
             <UserFormDialog user={item} />
             <DropdownMenuItem
+              className="cursor-pointer"
               onClick={async () => {
                 const res = await deleteUser(item._id);
                 if (res) {
