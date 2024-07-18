@@ -36,6 +36,8 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { UserFormDialog } from "./user-form-dialog";
+import { deleteUsers } from "@/actions/deleteUsers";
+import { useToast } from "@/components/ui/use-toast";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -50,6 +52,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const { toast } = useToast();
 
   const table = useReactTable({
     data,
@@ -125,7 +128,30 @@ export function DataTable<TData, TValue>({
           <div className="flex items-center py-4">
             <Button
               variant="destructive"
-              onClick={() => table.resetRowSelection()}
+              onClick={async () => {
+                console.log({ val: table.getFilteredSelectedRowModel().rows });
+
+                const ids: string[] = table
+                  .getFilteredSelectedRowModel()
+                  // @ts-ignore
+                  .rows.map((row) => row.original._id);
+
+                const res = await deleteUsers(ids);
+
+                if (res) {
+                  toast({
+                    title: "Users deleted",
+                    description: "Selected users have been deleted.",
+                  });
+                  return;
+                }
+
+                toast({
+                  title: "Error",
+                  description: "An error occurred. Please try again.",
+                  variant: "destructive",
+                });
+              }}
             >
               Delete all
             </Button>
